@@ -280,5 +280,5 @@ The table below summarizes the clustering performance of the QGCN on the synthet
 
 **Key Observation:** Despite compressing the 16 input features into just **4 qubits**, the QGCN successfully preserves the graph's community structure. The clear separation between the three clusters (colored by K-Means assignment) demonstrates that the quantum circuit has learned meaningful topological representations without any supervision.
 
-![Micro-Benchmark t-SNE Plot](assets/micro_benchmark_tsne.pdf)
+![Micro-Benchmark t-SNE Plot](assets/micro_benchmark_tsne.jpg)
 *(Figure: 2D t-SNE projection of the 4-qubit quantum embeddings. Colors represent the clusters assigned by K-Means, which align strongly with the ground truth communities.)*
