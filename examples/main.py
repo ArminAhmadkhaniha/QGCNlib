@@ -1,3 +1,23 @@
+import sys
+import os
+
+# -----------------------------------------------------------------------------
+# PATH FIX: Allow importing 'qgcn_lib' from the project root
+# -----------------------------------------------------------------------------
+# Get the directory where this script is located
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Get the project root (one level up from examples)
+project_root = os.path.abspath(os.path.join(current_dir, ".."))
+
+# Add project root to Python's search path if not already there
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+print(f"--> Added project root to path: {project_root}")
+# -----------------------------------------------------------------------------
+
+
 import torch
 import os
 import math
@@ -17,14 +37,13 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 # Configuration: Choose 'cora' or 'snp'
-dataset_name = 'cora' 
+dataset_name = 'snp' 
 
 # Construct the path relative to this script
 # We assume data is in a './data' folder next to this script
-current_dir = os.path.dirname(os.path.abspath(__file__))
 file_path = os.path.join(current_dir, 'data', f'{dataset_name}.pt')
 
-print(f"--> Initializing Library Wrapper for: {dataset_name.upper()}")
+print(f"--> Initializing Library Wrapper for: {dataset_name}")
 
 # USE THE WRAPPER: This creates a PyG-compatible dataset object
 try:
@@ -57,7 +76,7 @@ print(f"--> Quantum Latent Space (log d): {hidden_channels} Qubits")
 # -----------------------------------------------------------------------------
 def train_quantum_dgi(model, features, edge_index, epochs):
     """
-    Standard training loop with Differential Learning Rates.
+    Standard training loop.
     """
     model.to(device)
     features = features.to(device)
@@ -65,13 +84,13 @@ def train_quantum_dgi(model, features, edge_index, epochs):
 
     param_groups = []
     
-    # Group A: Quantum (High LR)
+    
     if hasattr(model.encoder, 'qc'):
         param_groups.append({'params': model.encoder.qc.parameters(), 'lr': 0.01})
     if hasattr(model.encoder, 'local_mp'):
         param_groups.append({'params': model.encoder.local_mp.parameters(), 'lr': 0.01})
 
-    # Group B: Classical (Low LR)
+    
     classical_params = []
     if hasattr(model.encoder, 'q_proj'): classical_params.extend(model.encoder.q_proj.parameters())
     if hasattr(model.encoder, 'bias'): classical_params.append(model.encoder.bias)
@@ -114,7 +133,7 @@ def run_experiment(features, idx_edge):
         corruption=feature_shuffling_corruption
     )
     
-    model = train_quantum_dgi(model, features, idx_edge, epochs=30)
+    model = train_quantum_dgi(model, features, idx_edge, epochs=50)
     
     model.eval()
     with torch.no_grad():
@@ -125,7 +144,7 @@ def run_experiment(features, idx_edge):
 # 5. Execution
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
-    z_path = os.path.join(current_dir, 'data', f"z_{dataset_name}.pt")
+    z_path = os.path.join(current_dir, f"z_{dataset_name}.pt")
     
     if os.path.exists(z_path):
         print(f"--> Loading existing embeddings from {z_path}")

@@ -1,3 +1,24 @@
+import sys
+import os
+
+# -----------------------------------------------------------------------------
+# PATH FIX: Allow importing 'qgcn_lib' from the project root
+# -----------------------------------------------------------------------------
+# Get the directory where this script is located
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Get the project root (one level up from examples)
+project_root = os.path.abspath(os.path.join(current_dir, ".."))
+
+# Add project root to Python's search path if not already there
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+print(f"--> Added project root to path: {project_root}")
+# -----------------------------------------------------------------------------
+
+
+
 import torch
 import os
 import numpy as np
@@ -17,11 +38,11 @@ from qgcn_lib.utils import (
 # Configuration
 # -----------------------------------------------------------------------------
 # Toggle this to match what you ran in main_paper.py
-DATASET_NAME = "cora"  # Options: "cora", "snp"
+DATASET_NAME = "snp"  # Options: "cora", "snp"
 
 # Paths
 current_dir = os.path.dirname(os.path.abspath(__file__))
-z_path = os.path.join(current_dir, 'data', f"z_{DATASET_NAME}.pt")
+z_path = os.path.join(current_dir, f"z_{DATASET_NAME}.pt")
 data_path = os.path.join(current_dir, 'data', f"{DATASET_NAME}.pt")
 
 # -----------------------------------------------------------------------------
@@ -33,7 +54,7 @@ def evaluate_embeddings():
     # 1. Load Embeddings
     if not os.path.exists(z_path):
         print(f"[ERROR] Embedding file not found: {z_path}")
-        print("Please run 'main_paper.py' first to generate embeddings.")
+        print("Please run 'main.py' first to generate embeddings.")
         return
 
     z = torch.load(z_path, map_location="cpu")
