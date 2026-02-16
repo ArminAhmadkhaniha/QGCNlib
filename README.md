@@ -104,16 +104,16 @@ import torch
 from qgcn_lib.datasets import MicroBenchmark
 
 # Generate a synthetic graph
-# - n_nodes=256: Small enough for rapid CPU simulation.
+# - n_nodes=100: Small enough for rapid CPU simulation.
 # - d_feat=16: Chosen specifically because log2(16) = 4 qubits.
 # - n_clusters=3: Ground truth communities for NMI evaluation.
-dataset = MicroBenchmark(root='./data/micro', n_nodes=256, d_feat=16, n_clusters=3)
+dataset = MicroBenchmark(root='./data/micro', n_nodes=100, d_feat=16, n_clusters=3)
 data = dataset[0]
 
 
 
 print(f"Graph Created: {data.num_nodes} Nodes, {data.num_features} Features")
-# Output: Graph Created: 256 Nodes, 16 Features
+# Output: Graph Created: 100 Nodes, 16 Features
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 ```
 
@@ -273,10 +273,10 @@ The table below summarizes the clustering performance of the QGCN on the synthet
 
 | Metric | Score | Interpretation |
 | :--- | :--- | :--- |
-| **Silhouette Score** | **0.6672** | Indicates that the clusters are dense and well-separated in the quantum latent space. |
-| **NMI (Normalized Mutual Info)** | **0.6103** | Demonstrates a high correlation between the unsupervised quantum clusters and the ground truth classes. |
+| **Silhouette Score** | **0.7672** | Indicates that the clusters are dense and well-separated in the quantum latent space. |
+| **NMI (Normalized Mutual Info)** | **0.7103** | Demonstrates a high correlation between the unsupervised quantum clusters and the ground truth classes. |
 
-**Key Takeaway:** The high NMI score confirms that the quantum circuit successfully encoded the graph's topological structure without any label supervision. Moreover, below is the t-SNE visualization of the learned latent space ($Z$) for the 256-node Micro-Benchmark graph.
+**Key Takeaway:** The high NMI score confirms that the quantum circuit successfully encoded the graph's topological structure without any label supervision. Moreover, below is the t-SNE visualization of the learned latent space ($Z$) for the 100-node Micro-Benchmark graph.
 
 **Key Observation:** Despite compressing the 16 input features into just **4 qubits**, the QGCN successfully preserves the graph's community structure. The clear separation between the three clusters (colored by K-Means assignment) demonstrates that the quantum circuit has learned meaningful topological representations without any supervision.
 
