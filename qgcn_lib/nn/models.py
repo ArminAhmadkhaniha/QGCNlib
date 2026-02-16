@@ -34,7 +34,7 @@ class QGCNConv(MessagePassing):
 
         
         q_out = torch.tanh(self.q_proj(out)) + self.bias
-        return q_out
+        return q_out + h
 
     def message(self, h_i, h_j):
         # Concatenate source and target features
