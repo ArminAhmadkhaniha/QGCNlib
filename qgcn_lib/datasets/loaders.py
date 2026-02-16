@@ -65,5 +65,13 @@ class ExperimentDataset(InMemoryDataset):
     def __init__(self, root, file_path, transform=None):
         self.file_path = file_path
         super().__init__(root, transform)
-        # Load the data directly from the path provided
-        self.data, self.slices = torch.load(self.file_path, weights_only=False)
+        # Load the file content
+        file_content = torch.load(self.file_path, weights_only=False)
+
+        # Check if it is a tuple (Standard PyG Processed Format)
+        if isinstance(file_content, tuple):
+            self.data, self.slices = file_content
+        else:
+        # If it is a single Data object (Raw Save), we must collate it
+        # self.collate() automatically generates the necessary 'slices' for InMemoryDataset
+            self.data, self.slices = self.collate([file_content])

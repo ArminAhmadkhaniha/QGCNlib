@@ -1,3 +1,4 @@
+import math
 import torch
 import torch.nn as nn
 from torch_geometric.nn import MessagePassing
@@ -11,7 +12,7 @@ class QGCNConv(MessagePassing):
         super().__init__(aggr='add')
         
         # 1. Quantum Feature Extraction
-        self.n_qubits = max(1, int(torch.log2(torch.tensor(in_channels)).item()))
+        self.n_qubits = math.ceil(math.log2(in_channels))
         self.qc = quantum_feature_extraction(self.n_qubits, q_depth)
         
         # 2. Local Quantum Message Passing
@@ -51,7 +52,7 @@ class HybridQGCNConv(MessagePassing):
         super().__init__(aggr='add')
 
         # Stage 1: Quantum Feature Extraction
-        self.n_qubits = max(1, int(torch.log2(torch.tensor(in_channels)).item()) + 1)
+        self.n_qubits = math.ceil(math.log2(in_channels))
         self.qc = quantum_feature_extraction(self.n_qubits, q_depth)
         self.q_proj = nn.Linear(self.n_qubits, hidden_channels)
         self.bias = nn.Parameter(torch.zeros(hidden_channels))
