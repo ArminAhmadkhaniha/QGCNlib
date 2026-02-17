@@ -50,12 +50,11 @@ You can toggle between datasets (SNP/Cora) by commenting/uncommenting the config
 **Testing:**
 
 ### 1. Full Scale Execution (`main.py`)
-By default, the `examples/main_paper.py` script is designed to run the QGCN model on the **full dataset**.
+By default, the `examples/main.py` script is designed to run the QGCN model on the **full dataset**.
 * **Scope:** It considers *all* nodes and *all* edges in every epoch.
 * **No Batching:** There is no mini-batching; one epoch represents a complete pass over the entire graph topology.
-* **Performance Warning:** While this provides the most accurate global representation, it is computationally intensive. For large graphs, a full run can take **days** depending on your hardware. Use this approach only if you have powerful resources. Following, one can find out about what we have used for our experiments:
+* **Performance Warning:** While this provides the most accurate global representation, it is computationally intensive. For large graphs, a full run can take **days** depending on your hardware. Use this approach only if you have powerful resources. Check the [Nibi](https://docs.alliancecan.ca/wiki/Nibi) for one such example.
 
-[Nibi](https://docs.alliancecan.ca/wiki/Nibi), the Anishinaabemowin word for water, is a general purpose cluster of 134,400 CPU cores and 288 H100 NVIDIA GPUs. Built by Hypertec, the cluster is hosted and operated by SHARCNET at University of Waterloo.
 
 ### 2. Iterative batching (suggested)
 To handle the computational complexity described above, our research utilizes a dynamic **"Iterative batching"** strategy rather than standard batching. This approach allows us to scale to larger graphs by processing specific sub-sections of the graph sequentially.
@@ -73,10 +72,10 @@ The batching method varies by dataset density:
 
 * **For Dense Graphs (e.g., Cora):**
     * **Helper:** `extract_experiment_subgraph`
-    * **Logic:** Since nodes have sufficient neighbors ($N_{neighbors} \ge D_{target}$), we could successfully apply PCA to reduce feature dimensionality locally, if we want to use less number of qubits. We extract node-centric subgraphs to form our chunks.
-* **For Sparse/Constrained Graphs (e.g., SNP/Micro-Benchmark):**
+    * **Logic:** Since nodes have sufficient neighbors, We extract node-centric subgraphs to form our chunks.
+* **For Sparse/Constrained Graphs (e.g., SNP):**
     * **Helper:** `get_topk_degree_edges`
-    * **Logic:** In these datasets, node degrees are strictly limited (e.g., 5 neighbors), making PCA impossible for higher target dimensions in case one ever wants to use it. Instead of node-based subgraphs, we select chunks based on **Top-K Edges** (ranked by influence scores). This allows us to process the most critical topological connections.
+    * **Logic:** In this dataset, node degrees are strictly limited (e.g., 5 neighbors). Instead of previous method, we select chunks based on **Top-K Edges** (ranked by influence scores). This allows us to process the most critical topological connections.
 
 ### 3. Recommended Testing (Notebooks)
 To allow users to test this logic without committing to a multi-day training run, we provide a **Jupyter Notebook** in `examples/notebooks/`.
