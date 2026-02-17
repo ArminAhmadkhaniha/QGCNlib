@@ -7,6 +7,26 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
+## 📋 Table of Contents
+
+* **[📄 About the Paper](#-about-the-paper)**
+* **[🛠 Installation & Quick Start](#-installation--quick-start)**
+    * [Step 1: Clone & Install](#1-clone-the-repository)
+    * [Step 2: Running Experiments](#3-experiments)
+    * [⚠️ Computational Cost & Hardware](#-important-computational-cost--hardware-requirements)
+* **[🧪 Scalability & Testing](#testing)**
+    * [Full Scale Execution (Main.py)](#1-full-scale-execution-mainpy)
+    * [Iterative Batching (Suggested)](#2-iterative-batching-suggested)
+* **[📦 Package Overview: qgcn_lib](#-package-overview-qgcn_lib)**
+    * [Neural Network Modules](#1-neural-network-modules-qgcn_libnn)
+    * [Datasets](#2-datasets-qgcn_libdatasets)
+    * [Research Utilities](#3-research-utilities-qgcn_libutils)
+* **[🎓 Tutorial: Micro-Benchmark Clustering](#-tutorial-micro-benchmark-clustering)**
+    * [Data Generation](#1-data-generation)
+    * [Model Initialization](#2-model-initialization--training-strategy)
+    * [Evaluation & Results](#3-evaluation--visualization)
+
+
 ## 📄 About the Paper
 This Repository implements the algorithms and experiments described in our research paper:
 > **[Edge-Local and Qubit-Efficient Quantum Graph Learning for the NISQ Era]** > 
