@@ -13,7 +13,7 @@
 * **[🛠 Installation & Quick Start](#-installation--quick-start)**
     * [Step 1: Clone & Install](#1-clone-the-repository)
     * [Step 2: Running Experiments](#3-experiments)
-    * [Computational Cost & Hardware](#-important-computational-cost-and-hardware-requirements)
+    * [⚠️ Computational Cost and Hardware](#hardware-requirements)
 * **[🧪 Scalability & Testing](#testing)**
     * [Full Scale Execution (Main.py)](#1-full-scale-execution-mainpy)
     * [Iterative Batching (Suggested)](#2-iterative-batching-suggested)
@@ -60,14 +60,14 @@ python examples/main.py
 ```
 You can toggle between datasets (SNP/Cora) by commenting/uncommenting the configuration lines inside `examples/main.py`.
 
-### ⚠️ Important: Computational Cost and Hardware Requirements
+### Hardware Requirements
 
 **Please be aware:** Simulating quantum circuits on classical hardware is computationally intensive. The runtime and memory usage of `QGCNConv` depend heavily on three factors:
 1.  **Qubit Count ($\lceil \log_2 d \rceil$):** The Hilbert space grows exponentially ($2^n$).
 2.  **Edge Count ($|E|$):** Our **Latent Quantum Message Passing** requires calculating interactions for *every* edge in the graph.
 3.  **RAM Availability:** Storing state vectors for large batched operations requires significant memory.
 
-**Testing:**
+### Testing:
 
 ### 1. Full Scale Execution (`main.py`)
 By default, the `examples/main.py` script is designed to run the QGCN model on the **full dataset**.
