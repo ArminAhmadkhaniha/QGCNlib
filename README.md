@@ -13,7 +13,7 @@
 * **[🛠 Installation & Quick Start](#-installation--quick-start)**
     * [Step 1: Clone & Install](#1-clone-the-repository)
     * [Step 2: Running Experiments](#3-experiments)
-    * [⚠️ Computational Cost & Hardware](#-important-computational-cost--hardware-requirements)
+    * [Computational Cost & Hardware](#-important-computational-cost-and-hardware-requirements)
 * **[🧪 Scalability & Testing](#testing)**
     * [Full Scale Execution (Main.py)](#1-full-scale-execution-mainpy)
     * [Iterative Batching (Suggested)](#2-iterative-batching-suggested)
@@ -60,7 +60,7 @@ python examples/main.py
 ```
 You can toggle between datasets (SNP/Cora) by commenting/uncommenting the configuration lines inside `examples/main.py`.
 
-### ⚠️ Important: Computational Cost & Hardware Requirements
+### ⚠️ Important: Computational Cost and Hardware Requirements
 
 **Please be aware:** Simulating quantum circuits on classical hardware is computationally intensive. The runtime and memory usage of `QGCNConv` depend heavily on three factors:
 1.  **Qubit Count ($\lceil \log_2 d \rceil$):** The Hilbert space grows exponentially ($2^n$).
