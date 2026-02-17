@@ -1,21 +1,22 @@
 # QGCN
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![PennyLane](https://img.shields.io/badge/PennyLane-0.31+-CD32A8.svg)](https://pennylane.ai/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
-[![PyG](https://img.shields.io/badge/PyG-2.3+-3C2179.svg)](https://pytorch-geometric.readthedocs.io/)
+[![PennyLane](https://img.shields.io/badge/PennyLane-0.40+-CD32A8.svg)](https://pennylane.ai/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.6+-ee4c2c.svg)](https://pytorch.org/)
+[![PyG](https://img.shields.io/badge/PyG-2.6+-3C2179.svg)](https://pytorch-geometric.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
 ## 📄 About the Paper
 This Repository implements the algorithms and experiments described in our research paper:
-> **[Edge-Local and Qubit-Efficient Quantum Graph Learning for the NISQ Era]** > *Authors: Armin Ahmadkhaniha,Jake Doliskani* 
+> **[Edge-Local and Qubit-Efficient Quantum Graph Learning for the NISQ Era]** > 
 
-The exact implementation used to generate the results in the paper (for **Cora** and **SNP** datasets) can be found in `examples/main.py`.
+*Authors: Armin Ahmadkhaniha,Jake Doliskani* 
+
 
 ## 🛠 Installation & Quick Start
 
-To replicate the experiments from the paper, follow these steps to set up the environment and run the main implementation.
+To replicate the experiments from the paper, follow these steps to set up the environment.
 
 ### 1. Clone the Repository
 
@@ -31,12 +32,8 @@ Ensure you have Python installed, then install the required packages:
 pip install -r requirements.txt
 ```
 
-### 3. Run the Paper Experiments
-The direct implementation of the paper's methodology is located in `examples/main.py`. This script handles the data loading, model initialization, and training loop exactly as described in our research.
-
-Note: The datasets (SNP and Cora) are pre-packaged within the repository. No manual download is required.
-
-To run the experiment and generate the quantum embeddings:
+### 3. Experiments
+The experiments in `examples/main.py` involves running the **Pure, Full-Scale** versions of the **SNP** and **Cora** datasets. Note that the datasets (SNP and Cora) are pre-packaged within the repository. No manual download is required. To generate embeddings, one can run the following command: 
 
 ```bash
 python examples/main.py
@@ -45,20 +42,52 @@ You can toggle between datasets (SNP/Cora) by commenting/uncommenting the config
 
 ### ⚠️ Important: Computational Cost & Hardware Requirements
 
-The experiments in `examples/main.py` are configured to replicate the **exact results** from the paper. This involves running the **Pure, Full-Scale** versions of the **SNP** and **Cora** datasets.
-
 **Please be aware:** Simulating quantum circuits on classical hardware is computationally intensive. The runtime and memory usage of `QGCNConv` depend heavily on three factors:
 1.  **Qubit Count ($\lceil \log_2 d \rceil$):** The Hilbert space grows exponentially ($2^n$).
 2.  **Edge Count ($|E|$):** Our **Latent Quantum Message Passing** requires calculating interactions for *every* edge in the graph.
 3.  **RAM Availability:** Storing state vectors for large batched operations requires significant memory.
 
-**Alternative Testing:**
-* **Full Replication:** Running `main.py` on the full datasets is **time-consuming**. It processes all edges to ensure the highest fidelity message passing, as reported in the paper.
-* **Rapid Validation:** To validate the code flow without waiting for the full simulation:
-    1.  **Use the Micro-Benchmark:** See the **[Tutorial Section](#-tutorial-micro-benchmark-clustering)** below. This runs in seconds using a optimized small-scale graph.
-    2.  **Use Subgraph Utilities:** We provide `qgcn_lib.utils.extract_experiment_subgraph`. This function allows you to extract connected subgraphs with reduced feature dimensions (e.g., 4-5 qubits), making the experiment manageable on standard laptops while preserving topological structure. Note that `qgcn_lib.utils.extract_experiment_subgraph` employs PCA for dimensionality reduction to minimize qubit usage. This compression can lead to information loss; therefore, results may not be directly comparable to the full-scale experiment.
+**Testing:**
 
+### 1. Full Scale Execution (`main.py`)
+By default, the `examples/main_paper.py` script is designed to run the QGCN model on the **full dataset**.
+* **Scope:** It considers *all* nodes and *all* edges in every epoch.
+* **No Batching:** There is no mini-batching; one epoch represents a complete pass over the entire graph topology.
+* **Performance Warning:** While this provides the most accurate global representation, it is computationally intensive. For large graphs, a full run can take **days** depending on your hardware. Use this approach only if you have powerful resources. Following, one can find out about what we have used for our experiments:
 
+[Nibi](https://docs.alliancecan.ca/wiki/Nibi), the Anishinaabemowin word for water, is a general purpose cluster of 134,400 CPU cores and 288 H100 NVIDIA GPUs. Built by Hypertec, the cluster is hosted and operated by SHARCNET at University of Waterloo.
+
+### 2. Iterative batching (suggested)
+To handle the computational complexity described above, our research utilizes a dynamic **"Iterative batching"** strategy rather than standard batching. This approach allows us to scale to larger graphs by processing specific sub-sections of the graph sequentially.
+
+**The Workflow:**
+1.  **Chunk Selection:** We select a specific subgraph or set of edges.
+2.  **Short-Burst Training:** We train the model on this chunk for 10–15 iterations.
+3.  **Loss Monitoring:** We monitor the loss curve.
+    * *If the loss decreases:* The model is learning useful topology. We **save the model state** and proceed to the next chunk.
+    * *If the loss stagnates:* We discard the update, reload the previous state, and select a different chunk.
+4.  **Repeat:** This cycle continues until the entire graph is explored.
+
+#### Dataset-Specific Strategies
+The batching method varies by dataset density:
+
+* **For Dense Graphs (e.g., Cora):**
+    * **Helper:** `extract_experiment_subgraph`
+    * **Logic:** Since nodes have sufficient neighbors ($N_{neighbors} \ge D_{target}$), we could successfully apply PCA to reduce feature dimensionality locally, if we want to use less number of qubits. We extract node-centric subgraphs to form our chunks.
+* **For Sparse/Constrained Graphs (e.g., SNP/Micro-Benchmark):**
+    * **Helper:** `get_topk_degree_edges`
+    * **Logic:** In these datasets, node degrees are strictly limited (e.g., 5 neighbors), making PCA impossible for higher target dimensions in case one ever wants to use it. Instead of node-based subgraphs, we select chunks based on **Top-K Edges** (ranked by influence scores). This allows us to process the most critical topological connections.
+
+### 3. Recommended Testing (Notebooks)
+To allow users to test this logic without committing to a multi-day training run, we provide a **Jupyter Notebook** in `examples/notebooks/`.
+
+This notebook demonstrates the **Iterative batching** approach on a single segment of the graph. It shows:
+* How to extract a valid chunk (using the correct helper for your data).
+* How to train for a short burst.
+* How to save the model state for the next iteration.
+
+**[👉 Go to the Notebook Example](examples/notebooks/)**
+*(Recommended for understanding the code flow and getting quick, monitorable results.)*
 
 
 
