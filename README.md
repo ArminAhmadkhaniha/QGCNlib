@@ -88,20 +88,13 @@ To handle the computational complexity described above, our research utilizes a 
 4.  **Repeat:** This cycle continues until the entire graph is explored.
 
 #### Dataset-Specific Strategies
-The batching method varies by dataset density:
-
-* **For Dense Graphs (e.g., Cora):**
-    * **Helper:** `extract_experiment_subgraph`
-    * **Logic:** Since nodes have sufficient neighbors, We extract node-centric subgraphs to form our chunks.
-* **For Sparse/Constrained Graphs (e.g., SNP):**
-    * **Helper:** `get_topk_degree_edges`
-    * **Logic:** In this dataset, node degrees are strictly limited (e.g., 5 neighbors). Instead of previous method, we select chunks based on **Top-K Edges** (ranked by influence scores). This allows us to process the most critical topological connections.
+The batching method varies by dataset density. Please take a look at `extract_experiment_subgraph` function:
 
 ### 3. Recommended Testing (Notebooks)
 To allow users to test this logic without committing to a multi-day training run, we provide a **Jupyter Notebook** in `examples/notebooks/`.
 
 This notebook demonstrates the **Iterative batching** approach on a single segment of the graph. It shows:
-* How to extract a valid chunk (using the correct helper for your data).
+* How to extract a valid chunk.
 * How to train for a short burst.
 * How to save the model state for the next iteration.
 
