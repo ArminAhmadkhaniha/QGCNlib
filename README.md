@@ -53,7 +53,7 @@ pip install -r requirements.txt
 ```
 
 ### 3. Experiments
-The experiments in `examples/main.py` involves running the **Pure, Full-Scale** versions of the **SNP** and **Cora** datasets. Note that the datasets (SNP and Cora) are pre-packaged within the repository. No manual download is required. To generate embeddings, one can run the following command: 
+The experiments in `examples/main.py` involves running the **Pure, Full-Scale** versions of the **SNP** and **Cora** datasets. Note that the datasets (SNP and Cora) are pre-packaged within the repository. No manual download is required. One can run the following command: 
 
 ```bash
 python examples/main.py
@@ -77,31 +77,18 @@ By default, the `examples/main.py` script is designed to run the QGCN model on t
 
 
 ### 2. Iterative batching (suggested)
-To handle the computational complexity described above, our research utilizes a dynamic **"Iterative batching"** strategy rather than standard batching. This approach allows us to scale to larger graphs by processing specific sub-sections of the graph sequentially.
+To handle the computational complexity described above, one can utilize a dynamic **"Iterative batching"** strategy rather than standard batching. This approach allows to scale to larger graphs by processing specific sub-sections of the graph sequentially.
 
 **The Workflow:**
-1.  **Chunk Selection:** We select a specific subgraph or set of edges.
-2.  **Short-Burst Training:** We train the model on this chunk for 10–15 iterations.
-3.  **Loss Monitoring:** We monitor the loss curve.
-    * *If the loss decreases:* The model is learning useful topology. We **save the model state** and proceed to the next chunk.
-    * *If the loss stagnates:* We discard the update, reload the previous state, and select a different chunk.
+1.  **Chunk Selection:** Select a specific subgraph or set of edges.
+2.  **Short-Burst Training:** Train the model on this chunk for 10–15 iterations.
+3.  **Loss Monitoring:** Monitor the loss curve.
+    * *If the loss decreases:* The model is learning useful topology. **Save the model state** and proceed to the next chunk.
+    * *If the loss stagnates:* Discard the update, reload the previous state, and select a different chunk.
 4.  **Repeat:** This cycle continues until the entire graph is explored.
 
 #### Dataset-Specific Strategies
 The batching method varies by dataset density. Please take a look at `extract_experiment_subgraph` function:
-
-### 3. Recommended Testing (Notebooks)
-To allow users to test this logic without committing to a multi-day training run, we provide a **Jupyter Notebook** in `examples/notebooks/`.
-
-This notebook demonstrates the **Iterative batching** approach on a single segment of the graph. It shows:
-* How to extract a valid chunk.
-* How to train for a short burst.
-* How to save the model state for the next iteration.
-
-**[👉 Go to the Notebook Example](examples/notebooks/)**
-*(Recommended for understanding the code flow and getting quick, monitorable results.)*
-
-
 
 ## 📦 Package Overview: `qgcn_lib`
 

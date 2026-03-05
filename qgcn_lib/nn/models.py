@@ -1,6 +1,7 @@
 import math
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch_geometric.nn import MessagePassing
 from .quantum_networks import quantum_feature_extraction, local_qmp_layer 
 
@@ -21,6 +22,7 @@ class QGCNConv(MessagePassing):
         
         # 3. Non-Lineraity & Dimension-matching
         self.prelu = nn.PReLU(self.n_qubits)
+        self.relu = nn.ReLU()
         self.q_proj = nn.Linear(2*self.n_local, hidden_channels)
         self.bias = nn.Parameter(torch.zeros(hidden_channels))
 
@@ -33,8 +35,8 @@ class QGCNConv(MessagePassing):
         out = self.propagate(edge_index, h=h)
 
         
-        q_out = torch.tanh(self.q_proj(out)) + self.bias
-        return q_out + h
+        q_out = self.relu(self.q_proj(out)) + self.bias
+        return F.normalize(q_out + h, dim=1)
 
     def message(self, h_i, h_j):
         # Concatenate source and target features
