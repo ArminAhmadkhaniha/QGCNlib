@@ -50,7 +50,6 @@ class NISQQGCNConv(MessagePassing):
     A Pure NISQ-compatible Quantum Graph Convolutional Network layer.
     """
     def __init__(self, in_channels, q_depth=1):
-        # aggr='add' handles the Inter-Edge aggregation (summing neighbors together)
         super().__init__(aggr='add')
         
         # 1. Quantum Feature Extraction (Node-level)
@@ -58,7 +57,7 @@ class NISQQGCNConv(MessagePassing):
         self.qc = quantum_feature_extraction(self.n_qubits, q_depth)
         
         # 2. Local Quantum Message Passing (Edge-level)
-        # Note: The circuit logic acts on 2 * n_qubits (source + target)
+        
         self.local_mp = local_qmp_layer(self.n_qubits)
 
     def forward(self, x, edge_index):
@@ -72,9 +71,6 @@ class NISQQGCNConv(MessagePassing):
         # PyG automatically routes 'h' to the message() function as h_i and h_j
         out = self.propagate(edge_index, h=h)  # shape: [N, log2(D)]
         
-        # 3. Residual Connection & Normalization
-        # We add the original quantum state (h) to the aggregated neighbor states (out)
-        # Normalization (L2) ensures the vectors remain valid state representations
         return F.normalize(out + h, dim=1)
 
     def message(self, h_i, h_j):
@@ -90,9 +86,6 @@ class NISQQGCNConv(MessagePassing):
         m_ij = self.local_mp(inputs)           # shape: [E, 2 * log2(D)]
         
         # 3. Intra-Edge Aggregation (The "Folding" Step)
-        # We split the measurement vector back into its target and source portions.
-        # Adding them together reduces the dimension back to log2(D) purely mathematically,
-        # completely avoiding the need for a classical nn.Linear projection layer.
         target_portion = m_ij[:, :self.n_qubits]
         source_portion = m_ij[:, self.n_qubits:]
         
