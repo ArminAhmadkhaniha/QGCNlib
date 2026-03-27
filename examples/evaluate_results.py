@@ -54,7 +54,7 @@ def evaluate_embeddings():
     # 1. Load Embeddings
     if not os.path.exists(z_path):
         print(f"[ERROR] Embedding file not found: {z_path}")
-        print("Please run 'main.py' first to generate embeddings.")
+        print("Please run 'main' first to generate embeddings.")
         return
 
     z = torch.load(z_path, map_location="cpu")

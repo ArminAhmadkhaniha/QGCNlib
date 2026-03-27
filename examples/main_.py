@@ -26,7 +26,7 @@ from torch_geometric.nn import DeepGraphInfomax
 
 # --- 1. Import from our Library ---
 from qgcn_lib.datasets import ExperimentDataset 
-from qgcn_lib.nn import QGCNConv, SummaryMLP
+from qgcn_lib.nn import NISQQGCNConv, SummaryMLP
 from qgcn_lib.utils import set_all_seeds, feature_shuffling_corruption
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -117,10 +117,8 @@ def run_experiment(features, idx_edge):
     set_all_seeds(123)
     num_nodes = features.size(0)
     
-    encoder = QGCNConv(
-        in_channels=features.size(1), 
-        points=num_nodes, 
-        hidden_channels=hidden_channels, 
+    encoder = NISQQGCNConv(
+        in_channels=features.size(1),  
         q_depth=5 
     )
     
