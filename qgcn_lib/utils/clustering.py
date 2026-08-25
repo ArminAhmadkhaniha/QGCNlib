@@ -68,12 +68,3 @@ def perform_kmeans_clustering(
     )
 
     return predicted_clusters, z_numpy, silhouette
-
-def calculate_kmeans_inertia(z: torch.Tensor, k_range: Sequence[int]) -> Dict[int, float]:
-    """Calculates inertia for KMeans clustering across a range of k."""
-    z_np = z.detach().cpu().numpy()
-    inertia_results = {}
-    for k in k_range:
-        kmeans = KMeans(n_clusters=k, random_state=123, n_init='auto').fit(z_np)
-        inertia_results[k] = kmeans.inertia_
-    return inertia_results

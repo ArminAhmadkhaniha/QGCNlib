@@ -64,20 +64,3 @@ def visualize_embedding(
     )
 
     plt.close()
-
-def plot_elbow_method(inertia_data: Dict[int, float], save_path: str = None):
-    """Generates a line plot for the Elbow Method."""
-    k_values = list(inertia_data.keys())
-    inertias = list(inertia_data.values())
-    plt.figure(figsize=(8, 5))
-    plt.plot(k_values, inertias, marker='o', linestyle='-', color='blue')
-    plt.xlabel("Number of clusters (k)")
-    plt.ylabel("Inertia (WCSS)")
-    plt.title("Elbow Method for Optimal Number of Clusters")
-    plt.grid(True, linestyle='--', alpha=0.6)
-    if save_path:
-        plt.savefig(save_path)
-        plt.close()
-        print(f"Elbow plot saved to {save_path}")
-    else:
-        plt.show()

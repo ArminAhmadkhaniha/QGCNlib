@@ -7,7 +7,7 @@ from .quantum_networks import quantum_feature_extraction, local_qmp_layer, local
 
 class QGCNConv(MessagePassing):
     """
-    A Quantum Graph Convolutional Network (QGCN) layer compatible with quantum simulators.
+    A Quantum Graph Convolutional Network (QGCN) layer compatible with classical layers and non-linearity.
     """
     def __init__(self, in_channels, points, hidden_channels, q_depth=1):
         super().__init__(aggr='add')
@@ -85,11 +85,11 @@ class NISQQGCNConv(MessagePassing):
         # Applies the parameterized quantum circuit to the joint state
         m_ij = self.local_mp(inputs)           # shape: [E, 2log2(D)]
         
-        # 3. Intra-Edge Aggregation (The "Folding" Step)
+        # 3. Intra-Edge Aggregation 
         target_portion = m_ij[:, :self.n_qubits]
         source_portion = m_ij[:, self.n_qubits:]
         
-        folded_message = target_portion + source_portion  # shape: [E, log2(D)]
+        folded_message = target_portion + source_portion  
         
         return folded_message
     
@@ -116,8 +116,8 @@ class NISQQGCNConv_gammazero(MessagePassing):
         h = self.qc(x).float()  # shape: [N, log2(D)]
         
         # 2. Trigger message passing across all edges
-        # PyG automatically routes 'h' to the message() function as h_i and h_j
-        out = self.propagate(edge_index, h=h)  # shape: [N, log2(D)]
+        
+        out = self.propagate(edge_index, h=h)  
         
         return F.normalize(out + h, dim=1)
 
@@ -130,14 +130,13 @@ class NISQQGCNConv_gammazero(MessagePassing):
         inputs = torch.cat([h_i, h_j], dim=1)  # shape: [E, 2 * log2(D)]
         
         # 2. Quantum Entanglement & Measurement
-        # Applies the parameterized quantum circuit to the joint state
         m_ij = self.local_mp(inputs)           # shape: [E, 2log2(D)]
         
-        # 3. Intra-Edge Aggregation (The "Folding" Step)
+        # 3. Intra-Edge Aggregation
         target_portion = m_ij[:, :self.n_qubits]
         source_portion = m_ij[:, self.n_qubits:]
         
-        folded_message = target_portion + source_portion  # shape: [E, log2(D)]
+        folded_message = target_portion + source_portion 
         
         return folded_message
 
