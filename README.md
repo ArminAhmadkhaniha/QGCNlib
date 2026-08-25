@@ -16,10 +16,6 @@
     * [Neural Network Modules](#1-neural-network-modules-qgcn_libnn)
     * [Datasets](#2-datasets-qgcn_libdatasets)
     * [Research Utilities](#3-research-utilities-qgcn_libutils)
-* **[🎓 Tutorial: Micro-Benchmark Clustering](#-tutorial-micro-benchmark-clustering)**
-    * [Data Generation](#1-data-generation)
-    * [Model Initialization](#2-model-initialization--training-strategy)
-    * [Evaluation & Results](#3-evaluation--visualization)
 
 
 ## 📄 About the Paper
