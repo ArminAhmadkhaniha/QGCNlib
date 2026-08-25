@@ -84,9 +84,9 @@ def local_qmp_layer(L):
         
         for k in range(L):
             # Encode h_i[k] into wire k
-            qml.RX(inputs[:, k], wires=k)
+            qml.RY(inputs[:, k], wires=k)
             # Encode h_j[k] into wire L+k
-            qml.RX(inputs[:, L + k], wires=L + k)
+            qml.RY(inputs[:, L + k], wires=L + k)
 
         # 3. Local Interaction 
         # Interact Feature k of Node i with Feature k of Node j
@@ -107,3 +107,65 @@ def local_qmp_layer(L):
 
     weight_shapes = {"gamma": (L,), "betta": (n_wires,)}
     return qml.qnn.TorchLayer(qnode, weight_shapes)
+
+
+def local_qmp_layer_gamma_zero(L):
+    """
+    Constructs the Local Quantum Message Passing (QMP) layer
+    with gamma fixed to zero.
+
+    This is used for the gamma=0 ablation experiment.
+    Everything remains the same as the original QMP layer,
+    except that the ZZ interaction strength is fixed to zero
+    and is not trainable.
+    """
+
+    # We use L wires for Node i and L wires for Node j
+    n_wires = 2 * L
+
+    dev = qml.device("lightning.qubit", wires=n_wires)
+
+    @qml.qnode(dev, interface="torch")
+    def qnode(inputs, betta):
+
+        # 1. Angle Encoding
+        for k in range(L):
+
+            # Encode h_i[k] into wire k
+            qml.RY(inputs[:, k], wires=k)
+
+            # Encode h_j[k] into wire L+k
+            qml.RY(inputs[:, L + k], wires=L + k)
+
+        # 2. Local Interaction with gamma = 0
+        for k in range(L):
+
+            i_wire = k
+            j_wire = L + k
+
+            qml.CNOT([i_wire, j_wire])
+
+            # gamma is fixed to zero
+            qml.RZ(0.0, wires=j_wire)
+
+            qml.CNOT([i_wire, j_wire])
+
+        # 3. Local Mixers (Trainable)
+        for k in range(n_wires):
+            qml.RX(betta[k], wires=k)
+
+        # 4. Measurement
+        return [
+            qml.expval(qml.PauliZ(k))
+            for k in range(n_wires)
+        ]
+
+    # gamma is no longer a trainable parameter
+    weight_shapes = {
+        "betta": (n_wires,)
+    }
+
+    return qml.qnn.TorchLayer(
+        qnode,
+        weight_shapes
+    )
