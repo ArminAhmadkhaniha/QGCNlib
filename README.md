@@ -27,7 +27,7 @@ This Repository contains the model and algorithms in our research paper:
 
 ## 🛠 Installation
 
-To replicate the experiments from the paper, follow these steps to set up the environment.
+To install and use the implementation described in the paper, follow the steps below. Full-scale reproduction of the reported experiments can require substantial computational resources because of the cost of classical quantum-circuit simulation.
 
 ### 1. Clone the Repository
 
