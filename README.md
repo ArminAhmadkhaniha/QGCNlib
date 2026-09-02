@@ -50,7 +50,7 @@ pip install -r requirements.txt
 
 ## 📦 Package Overview: `qgcn_lib`
 
-The code is organized as a modular Python package `qgcn_lib`, designed to be compatible with the **PyTorch Geometric (PyG)** ecosystem using **PennyLane**. Please take a look at the examples for more details on how to use the library.
+The code is organized as a modular Python package `qgcn_lib`, designed to be compatible with the **PyTorch Geometric (PyG)** ecosystem using **PennyLane**.
 
 ### 1. Neural Network Modules (`qgcn_lib.nn`)
 This module contains the core quantum layers.
